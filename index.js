@@ -27,7 +27,7 @@ app.listen(port, () => {
 app.post('/api/login', function(req, res) {
 
   const {email, password} = req.body;
-  const log = true;
+  let log = true;
   const rows = [];
   db.all(`SELECT email, password, username FROM users WHERE email = ?`, [email], (err, row) => {
     if (err) {
