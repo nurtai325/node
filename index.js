@@ -139,3 +139,17 @@ app.post('/api/messages', async function (req, res) {
   console.log(messages)
   res.status(200).json({'messages': messages});
 });
+
+
+app.post('/api/send', async function (req, res) {
+  const {message, time, chat_id} = req.body;
+
+  db.all(`INSERT INTO messages (message, time, chat_id) VALUES(?, ?, ?) `, [message, time, chat_id], function (err) {
+    if (err) {
+      throw err;
+    }
+    
+    res.status(200).json({'insert': true});
+
+  } )
+});
