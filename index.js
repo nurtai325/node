@@ -126,9 +126,24 @@ app.post('/api/chats', async function (req, res) {
 });
 
 app.post('/api/messages', async function (req, res) {
-  const {chat_id} = req.body;
+  const {chat} = req.body;
+  let user;
+  const newPromise = new Promise((resolve, reject) => {
+    db.all(`SELECT chat_id FROM chats WHERE user1 = '${chat}' or user2 = '${chat}'`, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        console.log(rows);
+        resolve(rows[0].chat_id);
+      }
+    });
+  });
+
+  await newPromise.then((result) => {
+    user = result;
+  });
   const messages = await new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM messages WHERE chat_id = ${chat_id}`, [], (err, rows) => {
+    db.all(`SELECT * FROM messages WHERE chat_id = ${user}`, [], (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -138,4 +153,29 @@ app.post('/api/messages', async function (req, res) {
   });
   console.log(messages)
   res.status(200).json({'messages': messages});
+});
+
+app.post('/api/create', async function (req, res) {
+  const {username, user_name} = req.body;
+  db.all(`insert into chats (user1, user2) values `, [username, user_name], (err) => {
+    if (err) {
+      throw err;
+    } else {
+      res.status(200).json({'insert': true});
+    }
+  })
+});
+
+app.post('/api/search', async function (req, res) {
+  const {username} = req.body;
+
+  db.all(`SELECT * FROM chats`, [], function(err, rows) {
+    if (err) {
+      console.error('Error inserting user:', err);
+    } else {
+      res.status(200).json({'chats': rows});
+      console.log(rows);
+    }
+  });
+
 });
