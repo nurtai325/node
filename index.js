@@ -13,7 +13,7 @@ const db = new sqlite3.Database('mydatabase.db');
 
 const users = [];
 
-db.all("SELECT * FROM users, chats, messages" , [], (err, rows) => {
+db.all("SELECT * FROM users" , [], (err, rows) => {
   if(err) {
     throw err;
   }
@@ -51,7 +51,7 @@ app.post('/api/login', function(req, res) {
     
   }
   });
-  
+
 }); 
 
 app.post('/api/register', function(req, res) {
@@ -127,23 +127,9 @@ app.post('/api/chats', async function (req, res) {
 
 app.post('/api/messages', async function (req, res) {
   const {chat} = req.body;
-  let user;
-  const newPromise = new Promise((resolve, reject) => {
-    db.all(`SELECT chat_id FROM chats WHERE user1 = '${chat}' or user2 = '${chat}'`, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        console.log(rows);
-        resolve(rows[0].chat_id);
-      }
-    });
-  });
-
-  await newPromise.then((result) => {
-    user = result;
-  });
+  const some = parseInt(chat)
   const messages = await new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM messages WHERE chat_id = ${user}`, [], (err, rows) => {
+    db.all(`SELECT * FROM messages WHERE chat_id = ${some}`, [], (err, rows) => {
       if (err) {
         reject(err);
       } else {
@@ -151,42 +137,75 @@ app.post('/api/messages', async function (req, res) {
       }
     });
   });
-  console.log(messages)
   res.status(200).json({'messages': messages});
 });
+
 app.post('/api/send', async function (req, res) {
-  const {message, time, chat_id} = req.body;
+  const {message, time, chat_id, sender} = req.body;
 
-  db.all(`INSERT INTO messages (message, time, chat_id) VALUES(?, ?, ?) `, [message, time, chat_id], function (err) {
-    if (err) {
-      throw err;
-    }
-    
-    res.status(200).json({'insert': true});
-
-  } )
+  try {
+    db.all(`INSERT INTO messages (message, time, chat_id, sender) VALUES(?, ?, ?, ?) `, [message, time, chat_id, sender], function (err) {
+      if (err) {
+        throw err;
+      }
+      console.log(req.body)
+      console.log(chat_id)
+      res.status(200).json({'insert': true});
+  
+    } )
+  }
+  catch (err) {
+    console.log(err);
+  }
 });
 
 app.post('/api/create', async function (req, res) {
   const {username, user_name} = req.body;
-  db.all(`insert into chats (user1, user2) values `, [username, user_name], (err) => {
-    if (err) {
-      throw err;
+  
+  try {
+    // Check if the combination of username and user_name already exists
+    const existingRow = await new Promise((resolve, reject) => {
+      db.get(`SELECT * FROM chats WHERE user1 = ? AND user2 = ?`, [username, user_name], (err, row) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(row);
+        }
+      });
+    });
+
+    if (existingRow) {
+      // If a row with the same username and user_name exists, send a response indicating that insertion is not allowed
+      res.status(400).json({'insert': false});
     } else {
+      // If no such row exists, proceed with insertion
+      await new Promise((resolve, reject) => {
+        db.run(`INSERT INTO chats (user1, user2) VALUES (?, ?)`, [username, user_name], (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            console.log('Inserted successfully');
+            resolve();
+          }
+        });
+      });
       res.status(200).json({'insert': true});
     }
-  })
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({'error': 'Internal Server Error'});
+  }
 });
+
 
 app.post('/api/search', async function (req, res) {
   const {username} = req.body;
 
-  db.all(`SELECT * FROM chats`, [], function(err, rows) {
+  db.all(`SELECT * FROM users`, [], function(err, rows) {
     if (err) {
       console.error('Error inserting user:', err);
     } else {
       res.status(200).json({'chats': rows});
-      console.log(rows);
     }
   });
 
