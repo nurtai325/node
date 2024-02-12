@@ -1,6 +1,8 @@
+// helper functions
 const { transporter } = require('./lib/email');
 const { generateRandomSixDigitNumber } = require('./lib/random');
 
+// express initialization
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -8,11 +10,11 @@ app.use(express.json());
 app.use(cors());
 const port = 8000;
 
+//database initialization
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('mydatabase.db');
 
-const users = [];
-
+// starting the server
 db.all("SELECT * FROM users" , [], (err, rows) => {
   if(err) {
     throw err;
@@ -24,6 +26,18 @@ app.listen(port, () => {
   console.log(`Listening at localhost:${port}`);
 });
 
+//implement real time socket.io here
+
+
+
+
+
+
+
+
+
+// api endpoints
+const users = [];
 app.post('/api/login', function(req, res) {
 
   const {email, password} = req.body;
