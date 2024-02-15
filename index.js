@@ -14,27 +14,34 @@ const port = 8000;
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('mydatabase.db');
 
+// real-time logic
+const { Server } = require('socket.io');
+const io = new Server();
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('message', function (message) {
+		// Отсылаем сообщение остальным участникам чата
+		socket.broadcast.emit('sendReceived', message);
+    console.log('socket', message);
+    console.log(message);
+	});
+});
+
+io.listen(5173);
+
 // starting the server
+app.listen(port, () => {
+  console.log(`Listening at localhost:${port}`);
+});
+
 db.all("SELECT * FROM users" , [], (err, rows) => {
   if(err) {
     throw err;
   }
   console.log(rows)
 })
-
-app.listen(port, () => {
-  console.log(`Listening at localhost:${port}`);
-});
-
-//implement real time socket.io here
-
-
-
-
-
-
-
-
 
 // api endpoints
 const users = [];
