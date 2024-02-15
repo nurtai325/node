@@ -19,6 +19,8 @@ const { Server } = require('socket.io');
 const io = new Server({cors: {
     origin: "https://16.171.152.69:5173",
     methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
   }
 });
 
