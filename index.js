@@ -15,14 +15,12 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('mydatabase.db');
 
 // real-time logic
-const { Server } = require('socket.io');
-const io = new Server({cors: {
-    origin: "https://16.171.152.69:5173",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
-    credentials: true
+const io = require('socket.io')(server, {
+  cors: {
+    origin: '*',
   }
 });
+
 
 io.on('connection', (socket) => {
   console.log('a user connected');
