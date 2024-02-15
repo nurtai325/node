@@ -16,7 +16,11 @@ const db = new sqlite3.Database('mydatabase.db');
 
 // real-time logic
 const { Server } = require('socket.io');
-const io = new Server();
+const io = new Server({cors: {
+    origin: "https://16.171.152.69:5173",
+    methods: ["GET", "POST"],
+  }
+});
 
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -25,7 +29,6 @@ io.on('connection', (socket) => {
 		// Отсылаем сообщение остальным участникам чата
 		socket.broadcast.emit('sendReceived', message);
     console.log('socket', message);
-    console.log(message);
 	});
 });
 
@@ -170,7 +173,6 @@ app.post('/api/send', async function (req, res) {
         throw err;
       }
       console.log(req.body)
-      console.log(chat_id)
       res.status(200).json({'insert': true});
   
     } )
