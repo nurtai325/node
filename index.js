@@ -5,7 +5,9 @@ const path = require('path');
 
 // express initialization
 const express = require('express');
-const app = express();
+const { createServer } = require("http");
+const httpServer = express();
+const app = createServer(httpServer);
 const cors = require('cors');
 app.use(express.json());
 app.use(cors());
