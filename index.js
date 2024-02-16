@@ -20,7 +20,11 @@ const db = new sqlite3.Database('mydatabase.db');
 
 // real-time logic
 const { Server } = require("socket.io");
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "16.171.152.69:8000"
+  },
+});
 
 io.on('connection', (socket) => {
   console.log('a user connected');
