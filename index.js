@@ -2,13 +2,16 @@
 const { transporter } = require('./lib/email');
 const { generateRandomSixDigitNumber } = require('./lib/random');
 const path = require('path');
-
-// express initialization
 const express = require('express');
 const { createServer } = require("http");
+const cors = require('cors');
+
+// express initialization
 const httpServer = express();
+httpServer.use(express.json());
+httpServer.use(cors());
 const app = createServer(httpServer);
-app.use(express.json());
+
 const port = 8000;
 app.use('/', express.static(path.resolve(__dirname, './dist')));
 
