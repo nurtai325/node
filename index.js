@@ -10,10 +10,11 @@ const cors = require('cors');
 const httpServer = express();
 httpServer.use(express.json());
 httpServer.use(cors());
+httpServer.use('/', express.static(path.resolve(__dirname, './dist')));
 const app = createServer(httpServer);
 
 const port = 8000;
-app.use('/', express.static(path.resolve(__dirname, './dist')));
+
 
 //database initialization
 const sqlite3 = require('sqlite3').verbose();
