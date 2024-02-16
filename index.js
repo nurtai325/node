@@ -1,6 +1,7 @@
 // helper functions
 const { transporter } = require('./lib/email');
 const { generateRandomSixDigitNumber } = require('./lib/random');
+const path = require('path');
 
 // express initialization
 const express = require('express');
@@ -9,6 +10,7 @@ const cors = require('cors');
 app.use(express.json());
 app.use(cors());
 const port = 8000;
+app.use('/', express.static(path.resolve(__dirname, './dist')));
 
 //database initialization
 const sqlite3 = require('sqlite3').verbose();
