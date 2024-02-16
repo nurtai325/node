@@ -33,7 +33,7 @@ io.on('connection', (socket) => {
 });
 
 // starting the server
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Listening at localhost:${port}`);
 });
 
