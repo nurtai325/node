@@ -7,14 +7,12 @@ const { createServer } = require("http");
 const cors = require('cors');
 
 // express initialization
-const httpServer = express();
-httpServer.use(express.json());
-httpServer.use(cors());
-httpServer.use('/', express.static(path.resolve(__dirname, './dist')));
-const app = createServer(httpServer);
-
+const app = express();
+app.use(express.json());
+app.use(cors());
+app.use('/', express.static(path.resolve(__dirname, './dist')));
+const httpServer = createServer(app);
 const port = 8000;
-
 
 //database initialization
 const sqlite3 = require('sqlite3').verbose();
@@ -22,7 +20,7 @@ const db = new sqlite3.Database('mydatabase.db');
 
 // real-time logic
 const { Server } = require("socket.io");
-const io = new Server(app);
+const io = new Server(httpServer);
 
 io.on('connection', (socket) => {
   console.log('a user connected');
