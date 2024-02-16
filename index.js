@@ -15,12 +15,8 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('mydatabase.db');
 
 // real-time logic
-const io = require('socket.io')(server, {
-  cors: {
-    origin: '*',
-  }
-});
-
+const { Server } = require("socket.io");
+const io = new Server(app);
 
 io.on('connection', (socket) => {
   console.log('a user connected');
@@ -31,8 +27,6 @@ io.on('connection', (socket) => {
     console.log('socket', message);
 	});
 });
-
-io.listen(5173);
 
 // starting the server
 app.listen(port, () => {
