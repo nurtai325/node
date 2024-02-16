@@ -8,9 +8,7 @@ const express = require('express');
 const { createServer } = require("http");
 const httpServer = express();
 const app = createServer(httpServer);
-const cors = require('cors');
 app.use(express.json());
-app.use(cors());
 const port = 8000;
 app.use('/', express.static(path.resolve(__dirname, './dist')));
 
